@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
     // End Region
 
-    //region service get celebrities list
+    //region API get celebrities list
 
     /**
      * get celebrities list for the first time
