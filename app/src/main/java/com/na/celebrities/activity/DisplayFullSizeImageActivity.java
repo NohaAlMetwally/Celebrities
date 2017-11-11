@@ -139,7 +139,6 @@ public class DisplayFullSizeImageActivity extends Activity {
 
                 Log.v(TAG, "Permission is revoked");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                Toast.makeText(this, "Permission Denied, cannot save to drive ", Toast.LENGTH_SHORT).show();
                 return false;
             }
         } else { //permission is automatically granted on sdk<23 upon installation
