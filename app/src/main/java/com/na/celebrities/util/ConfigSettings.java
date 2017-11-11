@@ -29,6 +29,10 @@ public class ConfigSettings {
     public static final String IMAGE_PATH_PRE_URL = "https://image.tmdb.org/t/p/w500";
     public static final String IMAGES = "/images";
 
+    //search
+    public static final String PAGE_URL = "&page=";
+    public static final String QUERY = "&query=";
+    public static final String TOTAL_RESULTS = "total_results";
 
     //Region URL
 
@@ -37,6 +41,8 @@ public class ConfigSettings {
     public static final String PERSON_DETAILS_URL =
             "https://api.themoviedb.org/3/person/";
     public static final String API_KEY_AND_LANGUAGE = "?api_key=6865e3d45733dd359a97be14db5b355a&language=en-US";
+    public static final String SEARCH_PERSON_URL =
+            "https://api.themoviedb.org/3/search/person" + API_KEY_AND_LANGUAGE + QUERY;
 
     //End Region
 

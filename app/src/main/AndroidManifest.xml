@@ -26,8 +26,12 @@
 
         <activity
             android:name=".activity.DisplayFullSizeImageActivity"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:label="Display Image" />
+            android:label="Display Image"
+            android:theme="@android:style/Theme.NoTitleBar" />
+
+        <activity
+            android:name=".activity.SearchActivity"
+            android:label="Search" />
 
     </application>
 

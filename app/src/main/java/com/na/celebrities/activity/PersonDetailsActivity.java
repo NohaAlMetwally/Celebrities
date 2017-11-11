@@ -201,20 +201,25 @@ public class PersonDetailsActivity extends AppCompatActivity {
      * set person details to textView
      */
     public void setTextViews() {
+
         String Gender;
         String deathDay;
 
         tvBioDetails.setText(personDetailsObject.getPersonBiography());
+
         if (personDetailsObject.getPersonGender() == 2)
             Gender = "Male";
         else Gender = "Female";
         tvGenderDetails.setText(Gender);
+
         tvBirthDayDetails.setText(personDetailsObject.getPersonBirthday());
+
         deathDay = personDetailsObject.getPersonDeathDay();
         if (deathDay != null && !deathDay.isEmpty() && !deathDay.equals("null")) {
             llDeathDay.setVisibility(View.VISIBLE);
             tvDeathdayDetails.setText(personDetailsObject.getPersonDeathDay());
         }
+
         tvPlaceOfBirthDetails.setText(personDetailsObject.getPersonPlaceOfBirth());
 
     }

@@ -1,11 +1,11 @@
 package com.na.celebrities.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -27,42 +27,61 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
-    private static final String TAG = MainActivity.class.getName();
-    ListView lvCelebrities;
+public class SearchActivity extends AppCompatActivity {
+    private static final String TAG = SearchActivity.class.getName();
+    ListView lvSearchResults;
+    ImageButton ibSearch;
+    EditText etSearch;
+    String searchWord;
     static ArrayList<Celebrities> celebritiesArrayList;
     CelebritiesListAdapter celebritiesListAdapter;
     int pageNumber;
+    static int totalResults;
     static int totalPagesNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_search);
         pageNumber = 1;
-        lvCelebrities = (ListView) findViewById(R.id.lvCelebrities);
-        getCelebritiesList(pageNumber);
-        lvCelebrities.setOnScrollListener(new EndlessScrollListener() {
+        initializeVars();
+
+        ibSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchWord = etSearch.getText().toString().trim();
+                if (searchWord != null && !searchWord.isEmpty() && !searchWord.equals(""))
+                    pageNumber = 1;
+                getCelebritiesSearchResultsList(pageNumber, searchWord);
+
+            }
+        });
+
+        lvSearchResults.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
                 //increase page number to load next page
                 int nextPage = ++pageNumber;
                 if (nextPage <= totalPagesNumber) {
-                    loadMore(nextPage);
+                    loadMore(nextPage, searchWord);
                     // ONLY if more data is actually being loaded; false otherwise.
                     return true;
                 } else return false;
             }
         });
 
-
     }
 
+    private void initializeVars() {
+        lvSearchResults = (ListView) findViewById(R.id.lvSearchResults);
+        ibSearch = (ImageButton) findViewById(R.id.ibSearch);
+        etSearch = (EditText) findViewById(R.id.etSearch);
+    }
 
     // region JSON Parsing
 
     /**
-     * parse JSON Object to get celebrities array list
+     * parse JSON Object to get searched celebrities array list
      *
      * @param jsonStr
      * @return
@@ -75,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 JSONObject jsonObj = new JSONObject(jsonStr.toString());
                 totalPagesNumber = jsonObj.getInt(ConfigSettings.TOTAL_PAGES);
+                totalResults = jsonObj.getInt(ConfigSettings.TOTAL_PAGES);
                 Log.d(TAG, "current page is " + jsonObj.getString(ConfigSettings.PAGE));
                 jsonArray = jsonObj.getJSONArray(ConfigSettings.RESULTS);
             } catch (JSONException e) {
@@ -106,13 +126,15 @@ public class MainActivity extends AppCompatActivity {
     //region API get celebrities list
 
     /**
-     * get celebrities list for the first time
+     * get searched celebrities list for first time
      *
      * @param pageNumber
+     * @param searchWord
      */
-    protected void getCelebritiesList(int pageNumber) {
+    protected void getCelebritiesSearchResultsList(int pageNumber, String searchWord) {
         RequestQueue queue = VollySingletone.getInstance(this).getRequestQueue();
-        StringRequest myReq = new StringRequest(Request.Method.GET, ConfigSettings.CELEBRITIES_URL + pageNumber
+        StringRequest myReq = new StringRequest(Request.Method.GET, ConfigSettings.SEARCH_PERSON_URL +
+                searchWord + ConfigSettings.PAGE_URL + pageNumber
                 , new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -120,14 +142,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, response.toString());
                 celebritiesArrayList = parseJson(response);
                 Log.d(TAG, "Celebrities list size = " + celebritiesArrayList.size());
-                celebritiesListAdapter = new CelebritiesListAdapter(MainActivity.this, celebritiesArrayList);
-                lvCelebrities.setAdapter(celebritiesListAdapter);
+                if (celebritiesArrayList.size() == 0)
+                    Toast.makeText(SearchActivity.this, "No Results Found!", Toast.LENGTH_SHORT).show();
+                celebritiesListAdapter = new CelebritiesListAdapter(SearchActivity.this, celebritiesArrayList);
+                lvSearchResults.setAdapter(celebritiesListAdapter);
                 celebritiesListAdapter.notifyDataSetChanged();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, "Failed : No HTTP setting", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchActivity.this, "Failed : No HTTP setting", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Failed : No HTTP setting ");
             }
         });
@@ -139,9 +163,10 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param pageNumber
      */
-    protected void loadMore(int pageNumber) {
+    protected void loadMore(int pageNumber, String searchWord) {
         RequestQueue queue = VollySingletone.getInstance(this).getRequestQueue();
-        StringRequest myReq = new StringRequest(Request.Method.GET, ConfigSettings.CELEBRITIES_URL + pageNumber
+        StringRequest myReq = new StringRequest(Request.Method.GET, ConfigSettings.SEARCH_PERSON_URL +
+                searchWord + ConfigSettings.PAGE_URL + pageNumber
                 , new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -154,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(MainActivity.this, "Failed : No HTTP setting", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchActivity.this, "Failed : No HTTP setting", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Failed : No HTTP setting ");
             }
         });
@@ -163,33 +188,5 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //End Region
-
-    //region action bar
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                Intent iStartSearchActivity = new Intent(MainActivity.this, SearchActivity.class);
-                startActivity(iStartSearchActivity);
-                return true;
-
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-
-        }
-    }
-
-    //end region
 }
 
