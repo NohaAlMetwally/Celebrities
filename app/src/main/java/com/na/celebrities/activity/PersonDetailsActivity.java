@@ -35,11 +35,11 @@ import java.util.ArrayList;
 public class PersonDetailsActivity extends AppCompatActivity {
     private static final String TAG = PersonDetailsActivity.class.getName();
     Intent intent;
-    String personName;
+    static String personName;
     int personId;
     PersonDetails personDetailsObject;
     TextView tvBioDetails, tvGenderDetails, tvBirthDayDetails, tvDeathdayDetails, tvPlaceOfBirthDetails;
-    LinearLayout llDeathDay;
+    LinearLayout llDeathDay, llBio, llGender, llBirthDay, llPlaceOfBirth;
     MyGridView gvPersonImages;
     PersonImagesGridAdapter personImageGridAdapter;
     ArrayList<Images> ImagesArrayList;
@@ -64,6 +64,10 @@ public class PersonDetailsActivity extends AppCompatActivity {
         tvDeathdayDetails = (TextView) findViewById(R.id.tvDeathdayDetails);
         tvPlaceOfBirthDetails = (TextView) findViewById(R.id.tvPlaceOfBirthDetails);
         llDeathDay = (LinearLayout) findViewById(R.id.llDeathday);
+        llBio = (LinearLayout) findViewById(R.id.llBio);
+        llGender = (LinearLayout) findViewById(R.id.llGender);
+        llBirthDay = (LinearLayout) findViewById(R.id.llBirthDay);
+        llPlaceOfBirth = (LinearLayout) findViewById(R.id.llPlaceOfBirth);
         gvPersonImages = (MyGridView) findViewById(R.id.gvPersonImages);
 
     }
@@ -98,6 +102,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
 
     /**
      * parse image json object
+     *
      * @param jsonStr
      * @return
      */
@@ -122,7 +127,7 @@ public class PersonDetailsActivity extends AppCompatActivity {
                                     + imageJsonObj.getString(ConfigSettings.FILE_PATH)
                                     , imageJsonObj.getInt(ConfigSettings.HEIGHT)
                                     , imageJsonObj.getInt(ConfigSettings.WIDTH)
-                                    , imageJsonObj.getInt(ConfigSettings.ASPECT_RATIO));
+                                    , imageJsonObj.getInt(ConfigSettings.ASPECT_RATIO), personName);
                     personImagesArrayList.add(imageObject);
                     Log.d(TAG, "Image added");
 
@@ -202,25 +207,54 @@ public class PersonDetailsActivity extends AppCompatActivity {
      */
     public void setTextViews() {
 
+        Boolean isActivityHasData = false;
         String Gender;
-        String deathDay;
+        String deathDay = personDetailsObject.getPersonDeathDay();
+        String birthDay = personDetailsObject.getPersonBirthday();
+        String biography = personDetailsObject.getPersonBiography();
+        String placeOfBirth = personDetailsObject.getPersonPlaceOfBirth();
 
-        tvBioDetails.setText(personDetailsObject.getPersonBiography());
+        if (personDetailsObject.getPersonGender() != 0) {
+            if (personDetailsObject.getPersonGender() == 2)
+                Gender = "Male";
+            else Gender = "Female";
+            tvGenderDetails.setText(Gender);
+            isActivityHasData = true;
+        } else
+            llGender.setVisibility(View.GONE);
 
-        if (personDetailsObject.getPersonGender() == 2)
-            Gender = "Male";
-        else Gender = "Female";
-        tvGenderDetails.setText(Gender);
+        //check if biography is not null, if so hide layout
+        if (biography != null && !biography.isEmpty() && !biography.equals("null")) {
+            tvBioDetails.setText(biography);
+            isActivityHasData = true;
+        } else
+            llBio.setVisibility(View.GONE);
 
-        tvBirthDayDetails.setText(personDetailsObject.getPersonBirthday());
+        //check if birthday is not null, if so hide layout
+        if (birthDay != null && !birthDay.isEmpty() && !birthDay.equals("null")) {
+            tvBirthDayDetails.setText(birthDay);
+            isActivityHasData = true;
+        } else
+            llBirthDay.setVisibility(View.GONE);
 
-        deathDay = personDetailsObject.getPersonDeathDay();
+        //check if deathDay exists
         if (deathDay != null && !deathDay.isEmpty() && !deathDay.equals("null")) {
             llDeathDay.setVisibility(View.VISIBLE);
             tvDeathdayDetails.setText(personDetailsObject.getPersonDeathDay());
+            isActivityHasData = true;
         }
 
-        tvPlaceOfBirthDetails.setText(personDetailsObject.getPersonPlaceOfBirth());
+        //check if Place Of Birth is not null, if so hide layout
+        if (placeOfBirth != null && !placeOfBirth.isEmpty() && !placeOfBirth.equals("null")) {
+            tvPlaceOfBirthDetails.setText(placeOfBirth);
+            isActivityHasData = true;
+        } else
+            llPlaceOfBirth.setVisibility(View.GONE);
+
+        if (!isActivityHasData) {
+            Toast.makeText(PersonDetailsActivity.this, personName + " has no details!", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
     }
 }

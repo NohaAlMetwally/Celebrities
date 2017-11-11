@@ -69,6 +69,7 @@ public class PersonImagesGridAdapter extends BaseAdapter {
                 iStartFullSizeImageActivity.putExtra("imagePath", imageObject.getImageFilePath());
                 iStartFullSizeImageActivity.putExtra("imageWidth", imageObject.getImageWidth());
                 iStartFullSizeImageActivity.putExtra("imageHeight", imageObject.getImageHeight());
+                iStartFullSizeImageActivity.putExtra("personName", imageObject.getPersonName());
                 context.startActivity(iStartFullSizeImageActivity);
             }
         });
@@ -79,3 +80,4 @@ public class PersonImagesGridAdapter extends BaseAdapter {
         ImageView ivPersonImage;
     }
 }
+

@@ -6,17 +6,20 @@ package com.na.celebrities.model;
 
 public class Images {
     String imageFilePath;
+
+    String personName;
     int imageHeight, imageWidth, imageAspectRatio;
 
     public Images() {
     }
 
     public Images(String imageFilePath
-            , int imageHeight, int imageWidth, int imageAspectRatio) {
+            , int imageHeight, int imageWidth, int imageAspectRatio, String personName) {
         this.imageAspectRatio = imageAspectRatio;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
         this.imageFilePath = imageFilePath;
+        this.personName = personName;
     }
 
     public String getImageFilePath() {
@@ -51,5 +54,11 @@ public class Images {
         this.imageAspectRatio = imageAspectRatio;
     }
 
+    public String getPersonName() {
+        return personName;
+    }
 
+    public void setPersonName(String personName) {
+        this.personName = personName;
+    }
 }

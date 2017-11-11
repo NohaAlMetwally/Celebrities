@@ -50,9 +50,12 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 searchWord = etSearch.getText().toString().trim();
-                if (searchWord != null && !searchWord.isEmpty() && !searchWord.equals(""))
+                if (searchWord != null && !searchWord.isEmpty() && !searchWord.equals("")) {
                     pageNumber = 1;
-                getCelebritiesSearchResultsList(pageNumber, searchWord);
+                    getCelebritiesSearchResultsList(pageNumber, searchWord);
+                } else {
+                    Toast.makeText(SearchActivity.this, "please enter a word", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -94,7 +97,7 @@ public class SearchActivity extends AppCompatActivity {
             try {
                 JSONObject jsonObj = new JSONObject(jsonStr.toString());
                 totalPagesNumber = jsonObj.getInt(ConfigSettings.TOTAL_PAGES);
-                totalResults = jsonObj.getInt(ConfigSettings.TOTAL_PAGES);
+                totalResults = jsonObj.getInt(ConfigSettings.TOTAL_RESULTS);
                 Log.d(TAG, "current page is " + jsonObj.getString(ConfigSettings.PAGE));
                 jsonArray = jsonObj.getJSONArray(ConfigSettings.RESULTS);
             } catch (JSONException e) {
@@ -142,7 +145,8 @@ public class SearchActivity extends AppCompatActivity {
                 Log.d(TAG, response.toString());
                 celebritiesArrayList = parseJson(response);
                 Log.d(TAG, "Celebrities list size = " + celebritiesArrayList.size());
-                if (celebritiesArrayList.size() == 0)
+                Log.d(TAG, "total results = " + totalResults);
+                if (totalResults == 0)
                     Toast.makeText(SearchActivity.this, "No Results Found!", Toast.LENGTH_SHORT).show();
                 celebritiesListAdapter = new CelebritiesListAdapter(SearchActivity.this, celebritiesArrayList);
                 lvSearchResults.setAdapter(celebritiesListAdapter);
@@ -151,8 +155,8 @@ public class SearchActivity extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(SearchActivity.this, "Failed : No HTTP setting", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "Failed : No HTTP setting ");
+                Toast.makeText(SearchActivity.this, "No Results Found!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Failed");
             }
         });
         queue.add(myReq);

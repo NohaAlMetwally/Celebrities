@@ -35,7 +35,7 @@ public class DisplayFullSizeImageActivity extends Activity {
     ImageView ivFullSizeImage;
     ImageButton ibDownloadImage;
     Intent intent;
-    String imagePath;
+    String imagePath, personName;
     int imageWidth, imageHeight;
 
     @Override
@@ -49,7 +49,7 @@ public class DisplayFullSizeImageActivity extends Activity {
             @Override
             public void onClick(View v) {
                 //ask for permission
-                if(isStoragePermissionGranted())
+                if (isStoragePermissionGranted())
                     downloadImage();
             }
         });
@@ -61,6 +61,7 @@ public class DisplayFullSizeImageActivity extends Activity {
         intent = getIntent();
         ivFullSizeImage = (ImageView) findViewById(R.id.ivFullSizeImage);
         ibDownloadImage = (ImageButton) findViewById(R.id.ibDownloadImage);
+        personName = intent.getStringExtra("personName");
         imagePath = intent.getStringExtra("imagePath");
         imageWidth = intent.getIntExtra("imageWidth", 400);
         imageHeight = intent.getIntExtra("imageHeight", 600);
@@ -93,7 +94,7 @@ public class DisplayFullSizeImageActivity extends Activity {
             Log.d(TAG, "directory created");
         }
         final ImageView profile = new ImageView(DisplayFullSizeImageActivity.this);
-        final String img_path = timeStamp + ".jpg";
+        final String img_path = personName + "_" + timeStamp + ".jpg";
         Log.d(TAG, "image name " + img_path);
         final File finalStorageDir = storageDir;
         Picasso.with(DisplayFullSizeImageActivity.this).load(imagePath).into(profile, new Callback() {
