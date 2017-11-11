@@ -1,6 +1,7 @@
 package com.na.celebrities.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.na.celebrities.R;
+import com.na.celebrities.activity.DisplayFullSizeImageActivity;
 import com.na.celebrities.model.Images;
 import com.squareup.picasso.Picasso;
 
@@ -24,6 +26,7 @@ public class PersonImagesGridAdapter extends BaseAdapter {
     LayoutInflater inflater;
     private ImageLoader mImageLoader;
     ArrayList<Images> personImagesArrayList;
+    Intent iStartFullSizeImageActivity;
 
     public PersonImagesGridAdapter(Context context, ArrayList<Images> personImagesArrayList) {
         this.context = context;
@@ -46,7 +49,7 @@ public class PersonImagesGridAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View convertView, ViewGroup viewGroup) {
+    public View getView(final int i, View convertView, ViewGroup viewGroup) {
 
         View view = convertView;
         if (view == null) {
@@ -57,8 +60,18 @@ public class PersonImagesGridAdapter extends BaseAdapter {
             view.setTag(holder);
         }
         Holder holder = (Holder) view.getTag();
-        Images imageObject = personImagesArrayList.get(i);
+        final Images imageObject = personImagesArrayList.get(i);
         Picasso.with(context).load(imageObject.getImageFilePath()).into(holder.ivPersonImage);
+        holder.ivPersonImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iStartFullSizeImageActivity = new Intent(context, DisplayFullSizeImageActivity.class);
+                iStartFullSizeImageActivity.putExtra("imagePath", imageObject.getImageFilePath());
+                iStartFullSizeImageActivity.putExtra("imageWidth", imageObject.getImageWidth());
+                iStartFullSizeImageActivity.putExtra("imageHeight", imageObject.getImageHeight());
+                context.startActivity(iStartFullSizeImageActivity);
+            }
+        });
         return view;
     }
 
